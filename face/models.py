@@ -13,10 +13,10 @@ class User(AbstractUser):
         ('male', '男'),
         ('female', '女'),
     )
-    username = models.CharField('姓名', max_length=20, unique=True, null=True, blank=True)
+    username = models.CharField('姓名', max_length=20, unique=True)
     number = models.CharField('学号', max_length=20, unique=True)
     sex = models.CharField('性别', max_length=6, choices=SEX_TYPE)
-    face = models.ImageField('人脸', blank=True, upload_to=get_photo_path)
+    face = models.CharField('人脸', max_length=100, blank=True)
     signin = models.ManyToManyField('Sign', blank=True, verbose_name='签到')
 
     def __str__(self):
@@ -28,7 +28,7 @@ class User(AbstractUser):
 
 class Sign(models.Model):
     title = models.CharField('标题', max_length=50)
-    description = models.CharField('描述', max_length=150, blank=True)
+    description = models.CharField('描述', max_length=150, blank=True, null=True)
 
     def __str__(self):
         return self.title
