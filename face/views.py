@@ -1,5 +1,5 @@
+import cv2
 import numpy as np
-from PIL import Image
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
 from rest_framework import status, mixins, viewsets
@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
+from utils.image_processing import (detector_cv2, model_path, recognizer, img_name, image_to_np,
+                                    base64_to_cv2, sign_img_save_path)
 from utils.permissions import IsOwnerOrReadOnly
-from utils.image_processing import detector_cv2, model_path, recognizer, img_name, image_to_np
 from utils.train import get_images, save_model
-
 from .models import User, Sign
 from .serializers import (UserDetailSerializer, UserRegisterSerializer, SignCreateSerializer, StuSignSerializer,
                           SignInfoListSerializer, SignInfoRetrieveSerializer, SignSerializer)
@@ -47,8 +47,10 @@ class UserViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.Upd
     update:
             用户个人资料修改
     """
+
     authentication_classes = (JSONWebTokenAuthentication, SessionAuthentication)
 
+    # queryset = User.objects.all()
     def get_queryset(self):
         if self.action == 'retrieve':
             return User.objects.filter(username=self.request.user.username)
@@ -103,7 +105,7 @@ class UserViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.Upd
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response('信息修改成功', status=status.HTTP_200_OK)
+        return Response('密码修改成功', status=status.HTTP_200_OK)
 
     # 返回当前用户 /user/{id} id可以是任意值
     def get_object(self):
@@ -130,24 +132,42 @@ class StuSignViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid()
         face = request.data['face']
-        # # print(face)
-        # image = Image.open(face).convert('L')
-        # image_np = np.array(image, 'uint8')
-        image_np = image_to_np(face)
+        # print(face.__dict__)
+        # {'file': < _io.BytesIO object at 0x000002109E9AB8E0 >, '_name': '微信图片_20201125224726.jpg', 'size': 75786, 'content_type': 'image/jpeg', 'charset': None, 'content_type_extra': {}, 'field_name': 'face', 'image': < PIL.JpegImagePlugin.JpegImageFile
+        # image
+        # mode = RGB
+        # size = 295
+        # x413
+        # at
+        # 0x2109E9220B8 >}
+        # print(request.data)
+        # print(face)
 
+        image = base64_to_cv2(face)
+        image_np = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # image=image_to_io(face)
+        # print(image)
+        # print(image.__dict__)
+        # image_pil = Image.open(image)
+        #
+        # image_np = image_to_np(image)
+        # cv2.imshow('1',image)
+        # cv2.waitKey(0)
+        # print(image_pil.__dict__)
         faces = detector_cv2.detectMultiScale(image_np, 1.2, 5)
         recognizer.read(model_path)
         user = User.objects.filter(username=request._user)[0]
-
+        # print(len(faces))
         for (x, y, w, h) in faces:
             img_id, conf = recognizer.predict(image_np[y:y + h, x:x + w])
-            # print(img_id, conf)
+            # print(img_id, conf, user.number)
             # img_id = 2017127249
-            if user.number == img_id:
-                face._name = img_name
+            if user.number == str(img_id):
                 user.signin.add(instance.id)
-                user.face = face
                 user.save()
+                path = str(sign_img_save_path.joinpath(user.number).joinpath(img_name))
+                cv2.imwrite(path, image)
+
                 # print(user_face)
                 # serializer.is_valid(raise_exception=True)
                 # self.perform_update(serializer)
@@ -157,10 +177,10 @@ class StuSignViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                 #     # forcibly invalidate the prefetch cache on the instance.
                 #     instance._prefetched_objects_cache = {}
 
-                return Response('签到成功')
+                return Response('签到成功', status=status.HTTP_200_OK)
             else:
-                return Response('签到失败，请重试')
-        return Response('获取图片失败')
+                return Response('签到失败,请重试', status=status.HTTP_202_ACCEPTED)
+        return Response('获取图片失败,请重试', status=status.HTTP_202_ACCEPTED)
 
 
 class SignCreateViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
