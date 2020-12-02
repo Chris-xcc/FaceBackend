@@ -8,8 +8,8 @@ def jwt_response_payload_handler(token, user=None, request=None):
     :user   当前登录的用户信息[对象]
     :request 当前本次客户端提交过来的数据
     """
-    print('token:'+token)
-    print('user:',user)
+    # print('token:'+token)
+    # print('user:',user)
     # return {
     #     'token': token,
     #     'id': user.id,
