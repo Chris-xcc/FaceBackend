@@ -47,12 +47,13 @@ class UserDetailSerializer(serializers.ModelSerializer):
         cv2.imwrite(str(img_path), img)
         # print(image)
         # face_img / 2017127249 / 微信图片_20201125224726.jpg
+        # print(db_path,img_path)
         instance.face = db_path
         # print(instance.face)
         if new_password == check_password:
             instance.set_password(new_password)
         instance.save()
-
+        # print(1111)
         return instance
 
     def validate_face(self, face):
@@ -126,6 +127,7 @@ class UserRegisterSerializer(serializers.Serializer):
         password = validated_data['password']
         sex = validated_data['sex']
         user = User.objects.create(number=number, password=password, sex=sex, username=username)
+        user_face_file(number)
 
         # 设置用户密码
         user.set_password(password)
