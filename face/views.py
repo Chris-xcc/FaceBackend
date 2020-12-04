@@ -105,7 +105,7 @@ class UserViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.Upd
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response('密码修改成功', status=status.HTTP_200_OK)
+        return Response('信息修改成功', status=status.HTTP_200_OK)
 
     # 返回当前用户 /user/{id} id可以是任意值
     def get_object(self):
@@ -157,10 +157,12 @@ class StuSignViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         faces = detector_cv2.detectMultiScale(image_np, 1.2, 5)
         recognizer.read(model_path)
         user = User.objects.filter(username=request._user)[0]
+        # print(request.__dict__)
+        # print(user)
         # print(len(faces))
         for (x, y, w, h) in faces:
             img_id, conf = recognizer.predict(image_np[y:y + h, x:x + w])
-            # print(img_id, conf, user.number)
+            print(img_id, conf, user.number)
             # img_id = 2017127249
             if user.number == str(img_id):
                 user.signin.add(instance.id)
