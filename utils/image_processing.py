@@ -14,16 +14,15 @@ from backend.settings import BASE_DIR
 detector_dlib = dlib.get_frontal_face_detector()
 
 detector_cv2 = cv2.CascadeClassifier(str(BASE_DIR.joinpath('model').joinpath('haarcascade_frontalface_alt2.xml')))
-model_path = str(BASE_DIR.joinpath('model').joinpath('trainner.yml'))
+model_path = str(BASE_DIR.joinpath('model').joinpath('face_model.yml'))
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 img_name = strftime("%Y%m%d%H%M%S", localtime()) + str(randint(10, 99)) + '.jpg'
 sign_img_save_path = BASE_DIR.joinpath('media/face_img')
 
 
-def user_face_file(dir_name):
-    path = sign_img_save_path.joinpath(dir_name)
-    print(path)
+def user_face_file(user_dir):
+    path = sign_img_save_path.joinpath(user_dir)
     path.mkdir(exist_ok=True)
 
 
