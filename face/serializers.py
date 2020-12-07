@@ -4,8 +4,8 @@ from django.core.validators import FileExtensionValidator
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from utils.image_processing import detector_cv2, image_to_np, image_to_io, img_name, base64_to_cv2, sign_img_save_path, \
-    user_face_file
+from utils.image_processing import (detector_cv2, image_to_np, image_to_io, img_name, base64_to_cv2, sign_img_save_path,
+                                    user_face_file)
 from .models import User, Sign
 
 
