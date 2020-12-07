@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework_jwt.serializers import jwt_encode_handler, jwt_payload_handler
 
 from utils.image_processing import (detector_cv2, model_path, recognizer, img_name, image_to_np,
                                     base64_to_cv2, sign_img_save_path)
@@ -82,12 +83,16 @@ class UserViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.Upd
         serializer.is_valid(raise_exception=True)
         user = self.perform_create(serializer)
         re_dict = serializer.data
-        # payload = jwt_payload_handler(user)
-        # re_dict['token'] = jwt_encode_handler(payload)
-        # re_dict['name'] = user.username
+        # 注册后自动登录
+        payload = jwt_payload_handler(user)
+        re_dict['token'] = jwt_encode_handler(payload)
+        re_dict['username'] = user.username
+        re_dict['is_superuser'] = user.is_superuser
+        re_dict['face'] = user.face
+        re_dict['id'] = user.id
 
         headers = self.get_success_headers(serializer.data)
-        return Response('用户创建成功', status=status.HTTP_201_CREATED, headers=headers)
+        return Response(re_dict, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         return serializer.save()
