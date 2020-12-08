@@ -122,6 +122,11 @@ class UserRegisterSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
+        """
+        创建用户
+        :param validated_data:
+        :return:
+        """
         username = validated_data['username']
         number = validated_data['number']
         password = validated_data['password']
@@ -201,8 +206,8 @@ class SignInfoRetrieveSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         user = User.objects.filter(signin__id=obj.id)
-        serializers_post = UserRetrieveSerializer(user, many=True)
-        return serializers_post.data
+        serializers_user = UserRetrieveSerializer(user, many=True)
+        return serializers_user.data
 
     class Meta:
         model = Sign
