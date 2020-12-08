@@ -147,7 +147,7 @@ class SignCreateSerializer(serializers.ModelSerializer):
 
 
 class StuSignSerializer(serializers.ModelSerializer):
-    face = serializers.CharField(required=False, label='人脸图片', help_text='人脸图片', )
+    face = serializers.CharField(required=True, label='人脸图片', help_text='人脸图片', )
 
     # max_length=None, use_url=True, allow_empty_file=False,
     # validators=[FileExtensionValidator(['jpg', 'png','jpeg'], message='必须为jpg,png格式的文件')])
