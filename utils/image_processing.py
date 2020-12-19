@@ -4,14 +4,13 @@ from random import randint
 from time import strftime, localtime
 
 import cv2
-import dlib
 import numpy as np
 from PIL import Image
 
 from backend.settings import BASE_DIR
 
-# Dlib 正向人脸检测器 / Use frontal face detector of Dlib
-detector_dlib = dlib.get_frontal_face_detector()
+# # Dlib 正向人脸检测器 / Use frontal face detector of Dlib
+# detector_dlib = dlib.get_frontal_face_detector()
 
 detector_cv2 = cv2.CascadeClassifier(str(BASE_DIR.joinpath('model').joinpath('haarcascade_frontalface_alt2.xml')))
 model_path = str(BASE_DIR.joinpath('model').joinpath('face_model.yml'))
