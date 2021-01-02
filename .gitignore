@@ -129,5 +129,6 @@ dmypy.json
 .pyre/
 
 face_img/
+.idea
 model/*.yml
 tree.txt

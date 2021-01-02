@@ -65,7 +65,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
         for (x, y, w, h) in faces:
             cv2.rectangle(gray, (x, y), (x + w, y + h), (0, 0, 225), 2)
-
+        print(len(faces))
         if len(faces) == 1:
             pass
         else:
